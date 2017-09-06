@@ -3,11 +3,72 @@
 
 # Question 1 (Naked Twins)
 Q: How do we use constraint propagation to solve the naked twins problem?  
-A: *Student should provide answer here*
+A: 
+*  Filter the boxes that could be potential naked twins, and then we search for the peers of this potential naked twins. Basically **eliminate** all the possibilities that don't fulfil the constraints criteria.  
+    
+    If the box in question has a twin then both box are stored in a list:
+    
+```python
+naked_twins = [[box1,box2] for box1 in potential_twins \
+                   for box2 in peers[box1] \
+                   if values[box1]==values[box2]]
+```
+ * Then from all the commun peers of the two boxes the two values present in them are eliminated from all the peers, because they are not part of the choices for a possible solution.
+    
+```python
+for k,v in enumerate(naked_twins):
+        box1 = v[0]
+        box2 = v[1]
+        # intersection of peers
+        peers1 = peers[box1]
+        peers2 = peers[box2]
+        peers_intersec = [box for box in peers1.intersection(peers2) if len(values[box]) > 2] 
+        # delete the digits in naked twins from all common peers.
+        for peer in peers_intersec:
+            for rm_val in values[box1]:
+                values[peer] = values[peer].replace(rm_val,'')
+```
+
+On key part is that to make a constraint propagation this process need to be done repeatedly along all the naked twins, that is done in using the **for** statement in the list of naked_twins 
 
 # Question 2 (Diagonal Sudoku)
 Q: How do we use constraint propagation to solve the diagonal sudoku problem?  
-A: *Student should provide answer here*
+A:
+
+How do we use constraint propagation to solve the diagonal sudoku problem?
+
+* Filter the boxes that belong to the diagonals, eliminating the box from the universe of boxes
+
+```python
+diagonal_units = [[row[k] for k, row in enumerate(row_units)], [row[len(row_units) -1- k] for k, row in enumerate(row_units)]]
+```
+
+* With the reduce_puzzle function the has inherent the constraint propagation paradigm, is applied searching for the possible solution eliminating possibilities and assigning only choices
+
+```python
+def reduce_puzzle(values):
+    values = grid_values(values)
+    stalled = False
+    while not stalled:
+        # Check how many boxes have a determined value
+        solved_values_before = len([box for box in values.keys() if len(values[box]) == 1])
+        #  Use the Eliminate Strategy
+        values = eliminate(values)
+        # Use the Only Choice Strategy
+        values = only_choice(values)
+        # Use the Naked Twins Strategy
+        values = naked_twins(values)
+        # Check how many boxes have a determined value, to compare
+        solved_values_after = len([box for box in values.keys() if len(values[box]) == 1])
+        # If no new values were added, stop the loop.
+        stalled = solved_values_before == solved_values_after
+        # Sanity check, return False if there is a box with zero available values:
+        if len([box for box in values.keys() if len(values[box]) == 0]):
+            return False
+
+    return values
+    pass
+```
 
 ### Install
 
