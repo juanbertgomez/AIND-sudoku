@@ -40,7 +40,8 @@ How do we use constraint propagation to solve the diagonal sudoku problem?
 * Filter the boxes that belong to the diagonals, eliminating the box from the universe of boxes
 
 ```python
-diagonal_units = [[row[k] for k, row in enumerate(row_units)], [row[len(row_units) -1- k] for k, row in enumerate(row_units)]]
+diagonal_units = [[row[k] for k, row in enumerate(row_units)],\
+                  [row[len(row_units) -1- k] for k, row in enumerate(row_units)]]
 ```
 
 * With the reduce_puzzle function the has inherent the constraint propagation paradigm, is applied searching for the possible solution eliminating possibilities and assigning only choices
