@@ -122,7 +122,6 @@ def only_choice(values):
     pass
 
 def reduce_puzzle(values):
-    values = grid_values(values)
     stalled = False
     while not stalled:
         # Check how many boxes have a determined value
@@ -170,7 +169,8 @@ def solve(grid):
     Returns:
         The dictionary representation of the final sudoku grid. False if no solution exists.
     """
-    return search(grid)
+    values = grid_values(grid)
+    return search(values)
 
 if __name__ == '__main__':
     diag_sudoku_grid = '2.............62....1....7...6..8...3...9...7...6..4...4....8....52.............3'
