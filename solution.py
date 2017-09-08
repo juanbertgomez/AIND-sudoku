@@ -51,19 +51,24 @@ def naked_twins(values):
                    for box2 in peers[box1] \
                    if values[box1]==values[box2]]
     naked_twins = list(k for k,_ in itertools.groupby(naked_twins) if len(naked_twins)>0)
-
-    # For each pair of naked twins,
+    naked_twins_boxes = []
+    for z in naked_twins:
+        for i in z:
+            naked_twins_boxes.append(i)
+    # For each pair of naked twins
     for k,v in enumerate(naked_twins):
         box1 = v[0]
         box2 = v[1]
         # intersection of peers
         peers1 = peers[box1]
-        peers2 = peers[box2]
-        peers_intersec = [box for box in peers1.intersection(peers2) if len(values[box]) > 2] 
+        peers2 = peers[box2]            
+        # eliminate naked twins from the peers intersection and solved values
+        peers_intersec = [box for box in peers1.intersection(peers2) if len(values[box]) != 1 and box not in naked_twins_boxes]
         # delete the digits in naked twins from all common peers.
-        for peer in peers_intersec:
-            for rm_val in values[box1]:
-                values[peer] = values[peer].replace(rm_val,'')
+        if len(peers_intersec) != 0:
+            for peer in peers_intersec:
+                for rm_val in sorted(values[box1]):
+                    values[peer] = values[peer].replace(rm_val,'')
     return values
 
 def grid_values(grid):
