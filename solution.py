@@ -47,14 +47,11 @@ def naked_twins(values):
     # Select boxes with 2 entries
     potential_twins = [box for box in values if len(values[box]) == 2]
     # Collect boxes that have the same elements
-    naked_twins = [list(set([box1,box2])) for box1 in potential_twins \
+    naked_twins = [sorted([box1,box2]) for box1 in potential_twins \
                    for box2 in peers[box1] \
                    if values[box1]==values[box2]]
-    naked_twins = list(k for k,_ in itertools.groupby(naked_twins) if len(naked_twins)>0)
-    naked_twins_boxes = []
-    for z in naked_twins:
-        for i in z:
-            naked_twins_boxes.append(i)
+    naked_twins = sorted(naked_twins)
+    naked_twins = list(naked_twins for naked_twins,_ in itertools.groupby(naked_twins))
     # For each pair of naked twins
     for k,v in enumerate(naked_twins):
         box1 = v[0]
@@ -63,12 +60,12 @@ def naked_twins(values):
         peers1 = peers[box1]
         peers2 = peers[box2]            
         # eliminate naked twins from the peers intersection and solved values
-        peers_intersec = [box for box in peers1.intersection(peers2) if len(values[box]) != 1 and box not in naked_twins_boxes]
+        peers_intersec = peers1.intersection(peers2)
         # delete the digits in naked twins from all common peers.
-        if len(peers_intersec) != 0:
-            for peer in peers_intersec:
-                for rm_val in sorted(values[box1]):
-                    values[peer] = values[peer].replace(rm_val,'')
+        for peer in peers_intersec:
+            if len(values[peer])>2:
+                for rm_val in values[box1]:
+                    values = assign_value(values, peer, values[peer].replace(rm_val,''))
     return values
 
 def grid_values(grid):
