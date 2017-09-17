@@ -41,32 +41,46 @@ def naked_twins(values):
         the values dictionary with the naked twins eliminated from peers.
     """
 
-    # Find all instances of naked twins
+    
     # Eliminate the naked twins as possibilities for their peers
     import itertools
-    # Select boxes with 2 entries
-    potential_twins = [box for box in values if len(values[box]) == 2]
-    # Collect boxes that have the same elements
-    naked_twins = [sorted([box1,box2]) for box1 in potential_twins \
-                   for box2 in peers[box1] \
-                   if values[box1]==values[box2]]
-    naked_twins = sorted(naked_twins)
-    naked_twins = list(naked_twins for naked_twins,_ in itertools.groupby(naked_twins))
-    # For each pair of naked twins
-    for k,v in enumerate(naked_twins):
-        box1 = v[0]
-        box2 = v[1]
-        # intersection of peers
-        peers1 = peers[box1]
-        peers2 = peers[box2]            
-        # eliminate naked twins from the peers intersection and solved values
-        peers_intersec = peers1.intersection(peers2)
-        # delete the digits in naked twins from all common peers.
-        for peer in peers_intersec:
-            if len(values[peer])>2:
-                for rm_val in values[box1]:
-                    values = assign_value(values, peer, values[peer].replace(rm_val,''))
+    for unit in unitlist:
+        # Find all instances of naked twins in the unit
+        naked_twins = [sorted([box1,box2]) for box1 in unit for box2 in unit \
+                       if values[box1] == values[box2] \
+                       and box1!=box2 and len(values[box1]) ==2]
+        #filter duplicates
+        naked_twins = list(naked_twins for naked_twins,_ in itertools.groupby(naked_twins))
+        #for every box in the unit
+        for box in unit:
+            for box1, box2 in naked_twins:
+                #that has more then 2 numbers
+                if values[box] != values[box1]:
+                    #delete the naked twins values
+                    for rm_val in values[box1]:
+                        values[box] = values[box].replace(rm_val,'')
     return values
+
+def grid_values_(grid):
+    """
+    Convert grid into a dict of {square: char} with '123456789' for empties.
+    Args:
+        grid(string) - A grid in string form.
+    Returns:
+        A grid in dictionary form
+            Keys: The boxes, e.g., 'A1'
+            Values: The value in each box, e.g., '8'. If the box has no value, then the value will be '123456789'.
+    """
+    values = []
+    for i in grid:
+        if i == '.':
+            values.append('.')
+        else: 
+            values.append(i)
+    assert len(values) == 81
+    return dict(zip(boxes,values))
+
+    pass
 
 def grid_values(grid):
     """
